@@ -41,7 +41,7 @@ jobs:
       - name: Install conan
         run: |
           python --version
-          pip install conan==1.59
+          pip install conan==1.62.0
           conan --version
           echo "Enabling conan revisions and setting parallel_download"
           conan config set general.revisions_enabled=True
@@ -61,7 +61,6 @@ jobs:
                 -DBUILD_TESTING:BOOL=OFF -DBUILD_RUBY_BINDINGS:BOOL=OFF -DBUILD_PYTHON_BINDINGS:BOOL=OFF -DBUILD_CLI:BOOL=OFF \
                 -DBUILD_PACKAGE:BOOL=OFF \
                 ../
-
           ninja
 
 
@@ -80,7 +79,6 @@ jobs:
                 -DBUILD_TESTING:BOOL=OFF -DBUILD_RUBY_BINDINGS:BOOL=OFF -DBUILD_PYTHON_BINDINGS:BOOL=OFF -DBUILD_CLI:BOOL=OFF \
                 -DBUILD_PACKAGE:BOOL=OFF \
                 ../
-
            ninja
 
       - name: Compile Windows 64
@@ -95,7 +93,7 @@ jobs:
                 -DBUILD_TESTING:BOOL=OFF -DBUILD_RUBY_BINDINGS:BOOL=OFF -DBUILD_PYTHON_BINDINGS:BOOL=OFF -DBUILD_CLI:BOOL=OFF ^
                 -DBUILD_PACKAGE:BOOL=OFF ^
                 ../
-          cmake --build . --verbose --config Release -j 2
+          cmake --build . --verbose --config Release -j 4
 
 
       - name: Install Dotnet x86
@@ -117,7 +115,7 @@ jobs:
                 -DBUILD_TESTING:BOOL=OFF -DBUILD_RUBY_BINDINGS:BOOL=OFF -DBUILD_PYTHON_BINDINGS:BOOL=OFF -DBUILD_CLI:BOOL=OFF ^
                 -DBUILD_PACKAGE:BOOL=OFF ^
                 ../
-          cmake --build . --verbose --config Release -j 2
+          cmake --build . --verbose --config Release -j 4
 
 
       - name: build nuget for Windows
