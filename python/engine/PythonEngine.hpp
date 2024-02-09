@@ -8,6 +8,7 @@
 
 #include <ScriptEngine.hpp>
 #include <ScriptEngineAPI.hpp>
+#include <utilities/core/Logger.hpp>
 
 #ifndef PyObject_HEAD
 struct _object;
@@ -16,10 +17,9 @@ using PyObject = _object;
 
 namespace openstudio {
 
-class PythonEngine final : public ScriptEngine
-{
+class PythonEngine final : public ScriptEngine {
  public:
-  PythonEngine(int argc, char* argv[]);
+  PythonEngine(int argc, char *argv[], const LoggerPtr &logger);
   ~PythonEngine() override;
 
   PythonEngine(const PythonEngine&) = delete;
@@ -50,9 +50,9 @@ class PythonEngine final : public ScriptEngine
 
 }  // namespace openstudio
 
-extern "C"
-{
-  SCRIPTENGINE_API openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]);
+extern "C" {
+SCRIPTENGINE_API openstudio::ScriptEngine *
+makeScriptEngine(int argc, char *argv[], const openstudio::LoggerPtr &logger);
 }
 
 #endif

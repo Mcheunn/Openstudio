@@ -56,13 +56,14 @@ class OSWorkflow;
 /// convenience function for SWIG, prefer macros in C++
 UTILITIES_API void logFree(LogLevel level, const std::string& channel, const std::string& message);
 
+class Logger;
+
 /** Singleton logger class.  Singleton Logger object maintains logging state throughout
    *   program execution.
    */
 class UTILITIES_API LoggerSingleton
 {
-
-  friend class Singleton<LoggerSingleton>;
+  friend class Logger;
 
  public:
   /// destructor, cleans up, writes xml file footers, etc
@@ -115,15 +116,22 @@ class UTILITIES_API LoggerSingleton
   SinkSetType m_sinks;
 };
 
-#if _WIN32 || _MSC_VER
+using LoggerPtr = std::shared_ptr<openstudio::LoggerSingleton>;
 
-/// Explicitly instantiate and export LoggerSingleton Singleton template instance
-/// so that the same instance is shared between the DLL's that link to Utilities.dll
-UTILITIES_TEMPLATE_EXT template class UTILITIES_API openstudio::Singleton<LoggerSingleton>;
+class UTILITIES_API Logger
+{
+ public:
+  static LoggerSingleton& instance() {
+    if (!logger) {
+      logger = LoggerPtr(new LoggerSingleton());
+    }
 
-#endif
+    return *logger;
+  }
 
-using Logger = openstudio::Singleton<LoggerSingleton>;
+  static LoggerPtr logger;
+};
+
 }  // namespace openstudio
 
 #endif  // UTILITIES_CORE_LOGGER_HPP

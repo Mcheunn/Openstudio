@@ -8,6 +8,7 @@
 
 #include "../utilities/core/ApplicationPathHelpers.hpp"
 #include "../utilities/core/DynamicLibrary.hpp"
+#include "../utilities/core/Logger.hpp"
 #include <any>
 #include <functional>
 #include <map>
@@ -35,7 +36,7 @@ struct ScriptObject
 };
 }  // namespace openstudio
 
-using ScriptEngineFactoryType = openstudio::ScriptEngine*(int, char**);
+using ScriptEngineFactoryType = openstudio::ScriptEngine*(int, char**, const openstudio::LoggerPtr&);
 
 namespace openstudio {
 
@@ -46,9 +47,7 @@ namespace measure {
 class ScriptEngine
 {
  public:
-  ScriptEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
-    // registerType<openstudio::measure::ModelMeasure*>("openstudio::measure::ModelMeasure *");
-  }
+  ScriptEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[], [[maybe_unused]] const LoggerPtr& logger) {}
 
   virtual ~ScriptEngine() = default;
   ScriptEngine(const ScriptEngine&) = delete;
@@ -143,12 +142,14 @@ class ScriptEngineInstance
       std::vector<char*> argv;
       std::transform(args.begin(), args.end(), std::back_inserter(argv), [](const std::string& item) { return const_cast<char*>(item.c_str()); });
 
+      Logger::instance();
+
       const auto enginePath = getOpenStudioModuleDirectory() / openstudio::getSharedModuleName(libraryName);
       // DynamicLibrary will perform dlopen on construction and dlclose on destruction
       // Don't create the DynamicLibrary until it is going to be used
       engineLib = std::make_unique<DynamicLibrary>(enginePath);
       const auto factory = engineLib->load_symbol<ScriptEngineFactoryType>("makeScriptEngine");
-      instance = std::unique_ptr<ScriptEngine>(factory(args.size(), argv.data()));
+      instance = std::unique_ptr<ScriptEngine>(factory(args.size(), argv.data(), Logger::logger));
       if (m_runSetupFun) {
         m_runSetupFun();
       }

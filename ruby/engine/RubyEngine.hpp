@@ -11,6 +11,7 @@
 
 #include <ScriptEngine.hpp>
 #include <ScriptEngineAPI.hpp>
+#include <utilities/core/Logger.hpp>
 #include <RubyInterpreter.hpp>
 
 namespace openstudio {
@@ -18,7 +19,8 @@ namespace openstudio {
 class RubyEngine final : public ScriptEngine
 {
  public:
-  RubyEngine(int argc = 0, char* argv[] = nullptr);
+  RubyEngine(int argc = 0, char *argv[] = nullptr,
+             const LoggerPtr &logger = nullptr);
   ~RubyEngine() override;
 
   RubyEngine(const RubyEngine&) = delete;
@@ -53,7 +55,8 @@ class RubyEngine final : public ScriptEngine
 
 extern "C"
 {
-  SCRIPTENGINE_API openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]);
+  SCRIPTENGINE_API openstudio::ScriptEngine *
+  makeScriptEngine(int argc, char *argv[], const openstudio::LoggerPtr &logger);
 }
 
 #endif

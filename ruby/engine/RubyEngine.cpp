@@ -48,8 +48,10 @@ VALUE initRestOfOpenStudio(...) {
   return Qtrue;
 };
 
-RubyEngine::RubyEngine(int argc, char* argv[]) : ScriptEngine(argc, argv) {
+RubyEngine::RubyEngine(int argc, char *argv[], const LoggerPtr &logger)
+    : ScriptEngine(argc, argv, logger) {
 
+  Logger::logger = logger;
   ruby_set_argv(argc, argv);
   Init_EmbeddedScripting();
 
@@ -209,8 +211,9 @@ int RubyEngine::numberOfArguments(ScriptObject& methodObject, std::string_view m
 
 extern "C"
 {
-  openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]) {
-    return new openstudio::RubyEngine(argc, argv);
+  openstudio::ScriptEngine *
+  makeScriptEngine(int argc, char *argv[], const openstudio::LoggerPtr &logger) {
+    return new openstudio::RubyEngine(argc, argv, logger);
   }
 
   int rb_hasFile(const char* t_filename) {

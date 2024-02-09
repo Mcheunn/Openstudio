@@ -71,8 +71,14 @@ void PythonEngine::setupPythonPath(const std::vector<openstudio::path>& includeD
   }
 }
 
-PythonEngine::PythonEngine(int argc, char* argv[]) : ScriptEngine(argc, argv), program(Py_DecodeLocale(pythonProgramName, nullptr)) {
-  // TODO: modernize and use PyConfig (new in 3.8): https://docs.python.org/3/c-api/init_config.html
+PythonEngine::PythonEngine(int argc, char *argv[], const LoggerPtr &logger)
+    : ScriptEngine(argc, argv, logger),
+      program(Py_DecodeLocale(pythonProgramName, nullptr)) {
+
+  Logger::logger = logger;
+  // TODO: modernize and use PyConfig (new in 3.8):
+  // https://docs.python.org/3/c-api/init_config.html
+
 
   // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
   Py_FrozenFlag = 1;
@@ -371,9 +377,9 @@ int PythonEngine::numberOfArguments(ScriptObject& classInstanceObject, std::stri
 
 }  // namespace openstudio
 
-extern "C"
-{
-  openstudio::ScriptEngine* makeScriptEngine(int argc, char* argv[]) {
-    return new openstudio::PythonEngine(argc, argv);
-  }
+extern "C" {
+openstudio::ScriptEngine *
+makeScriptEngine(int argc, char *argv[], const openstudio::LoggerPtr &logger) {
+  return new openstudio::PythonEngine(argc, argv, logger);
+}
 }
